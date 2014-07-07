@@ -1,0 +1,9 @@
+1. 查看分区对应uuid
+   ls -all /dev/disk/by-uuid  
+   UUID ，全称Universally Unique Identifier
+2. 编辑/etc/fstab文件，格式如下：
+   # <file system> <mount point>      <type>  <options>  <dump>  <pass>
+   UUID=XXXXX      /home/<user>/data   ext4    defaults   0       2
+3. 按照/etc/fstab 立即挂载所有未挂载的磁盘
+   mount -a
+    
