@@ -1,0 +1,33 @@
+jdb(The Java Debugger)使用基本用法：
+
+jdb [ options ] [ class ] [ arguments ] 
+-------------------------------------------------------------
+options   : 命令行选项
+class     : 需要调试的calss名称
+arguments : 传到main()方法中的参数
+-------------------------------------------------------------
+options 主要选项如下：
+	1. -help             : 显示帮助信息
+	2. -tclient          : 使用Java HotSpot VM(Client)
+	3. -tserver          : 使用Java HotSpot VM(Server)
+	4. -Joption          : 传递vm参数，如：-JXms48m
+	5. -D<name>=<value>  : 设置一个系统属性
+	6. -classpath <dirs> : 设置calsspath，dirs使用":"分割
+	7. -X<option>        : 设置非标准VM选项
+-------------------------------------------------------------
+基本的jdb命令
+1.  help,?         : 显示帮助信息
+2.  stop at <cls id>:<line>   : 在类的第几行设置断点
+3.  stop in <cls id>.<method> : 在类的某个方法上设置断点
+4.  cont           : 执行到下一个断点，如果没有下一个就执行到完
+5.  step           : 进入函数
+6.  next           : 执行下一步，不进入函数
+7.  use [src path] : 查看或设置源码路径，路径使用":"分割
+8.  list [method|line no] : 查看源码
+9.  print <exper>  : 打印表达式的值
+10. where          : 打印thread dump
+11. wherei 
+-------------------------------------------------------------
+
+待续。
+
