@@ -1,0 +1,23 @@
+■代理设置
+  git config --global http.proxy <ip addr>:<port>
+  git config --global https.proxy <ip addr>:<port>
+  git config --global http.sslverify false
+
+■推送(push)失败
+  在使用git push推送代码时出现如下情况：
+  -------------------------------------------------------------
+  error: The requested URL returned error: 403 while accessing 
+  https://github.com/XXX
+  -------------------------------------------------------------
+  将https协议修改为ssh协议，修改仓库根目录下的配置文件：
+  <REPO_HOME>/.git/config
+  -------------------------------------------------------------
+  [remote "origin"]
+	fetch = +refs/heads/*:refs/remotes/origin/*
+  -	url = https://github.com/ZoroXing/<REPO_NAME>
+  +	url = ssh://<username>:<passwd>@github.com:XXX.git
+  -------------------------------------------------------------
+  执行 git push -f 推送成功。
+
+
+待续。
