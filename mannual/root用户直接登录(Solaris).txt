@@ -1,0 +1,15 @@
+﻿Solaris环境root直接登录配置
+▶ssh 直接登录
+ 1. 修改/etc/user_attr,将type=role 修改为 type=normal；
+ 2. 修改/etc/ssh/sshd_config
+      将PermitRootLogin no为PermitRootLogin yes
+ 3. 重启ssh服务
+      svcadm restart ssh （svcadm restart svc:/network/ssh:default）
+▶telnet 直接登录
+ 1. 修改/etc/default/login
+      将CONSOLE=/dev/console注释掉
+ 2 重启telnet服务
+      svcadm restart svc:/network/telnet:default
+
+
+-以上-
