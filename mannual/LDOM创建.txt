@@ -1,0 +1,83 @@
+﻿                    SPARC上LDOM(Logical Domains)的安装和配置
+                                                              做成者:ZoroXing
+                                                              做成日:2014/07/09
+
+■1. 为控制域创建必须的服务，主要包括如下：
+      ▶ vdiskserver   ： 虚拟磁盘服务器
+        a. 添加vdiskserver
+           ldm add-vds <service-name> <ldom>
+           ldm add-vds primary-vds0 primary # 控制域为primary
+        b. 删除vdiskserver
+           ldm remove-vds [-f] <service-name>
+      ▶ vswitch       ： 虚拟交换机服务器
+        a. 使用ifconfig -a 查看网卡名称，如：net0
+        b. 添加vswitch
+           ldm add-vsw net-dev=<device> <vswitch-name> <ldom>
+           ldm add-vsw net-dev=<网卡名称> primary-vsw0 primary
+        c. 删除vswitch
+           ldm remove-vsw [-f] <vswitch-name>
+      ▶ vconscon      ： 虚拟终端服务器
+        a. 添加vconscon
+           ldm add-vcc port-range=<x-y> <vcc-name> <ldom>
+           ldm add-vcc port-range=5000-5100 primary-vcc0 primary
+        b. 删除vconscon
+           ldm remove-vcc [-f] <vcc-name>
+      ▶ 查看控制域已有的服务
+        ldm list-services primary
+      ▶ 启动虚拟网络终端服务
+        svcadm enable vntsd
+
+■2. 为控制域分配系统资源
+     a. 分配CPU
+        ldm set-vcpu 8 primary
+     b. 分配内存
+        ldm set-memory 4096m primary
+     c. 保存分配方案到SP中(service processor)
+        ldm add-config <config-name> #创建新配置文件
+        ldm add-config -r <autosave-name> #更新或创建配置文件
+        ldm list-config # 查看已存在配置文件
+
+■3. 创建客户域(虚拟机)
+     ▶分配系统资源(CPU,内存，网络)
+      a. ldm add-domain    jvm_sol11
+      b. ldm add-vcpu 4    jvm_sol11
+      c. ldm add-memory 4g jvm_sol11
+      d. ldm add-vnet vnet0 primary-vsw0 jvm_sol11
+     ▶使用zfs卷作为虚拟硬盘
+      a. zfs create -V 20g rpool/jvm_sol11
+      b. ldm add-vdsdev /dev/zvol/dsk/rpool/jvm_sol11 sol11_vol@primary-vds0
+      c. ldm add-vdisk sol11_vdisk sol11_vol@primary-vds0 jvm_sol11
+     ▶为虚拟机分配虚拟光驱(ISO)
+      a. ldm add-vdsdev /root/text_install_sparc.iso sol11_image@primary-vds0
+      b. ldm add-vdisk cdrom sol11_image@primary-vds0 jvm_sol11
+      c. ldm rm-vdisk cdrom jvm_sol11 #删除虚拟光驱
+     ▶将分配的资源绑定到虚拟机
+      a. ldm bind-domain jvm_sol11   # 绑定资源
+      b. ldm unbind-domain jvm_sol11 # 松绑
+      c. ldm list-bindings jvm_sol11 # 查看绑定信息
+      d. ldm start-domain jvm_sol11  # 启动虚拟机
+      e. ldm stop-domain jvm_sol11   # 关闭虚拟机
+
+■4. zfs文件系统快照
+     ▶创建销毁快照
+      a. #将创建一个 tank/home/cindy 的快照，其名称为 friday
+         zfs snapshot tank/home/cindy@friday 
+      b. #查看快照
+         zfs list -t snapshot
+      c. #销毁快照
+         zfs destory tank/home/cindy@friday
+      d. #重命名快照
+         zfs rename tank/home/cindy@snap1 today
+                                    <old> <new>
+      e. #回滚快照,将tank/home/cindy回滚到friday快照
+         zfs rollback tank/home/cindy@friday
+      f. #查看两个快照差异
+         zfs diff tank/home/tim@snap1 tank/home/tim@snap2
+     ▶zfs克隆
+      a. #创建克隆
+         zfs clone tank/home/cindy@friday tank/home/cindy_clone
+      b. #销毁克隆
+          zfs destroy tank/home/cindy_clone
+
+
+-以上-
