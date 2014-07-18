@@ -1,0 +1,65 @@
+                              Swing字体
+                                                             作成日：2014/07/17
+                                                             作成者：ZoroXing
+
+■1. 物理字体
+     这是实际的字体库，包括字形数据和表。这些数据和表使用字体技术将字符序列映射
+     为字形序列。常见的字体技术：
+      ▶ TrueType
+      ▶ PostScript Type 1
+   
+■2. 逻辑字体
+     Java运行时环境使用的字体，逻辑字体不是实际的字体库。由Java运行时环境将逻辑      字体名称映射到物理字体。
+     ● Java平台定义了5种字体系列(逻辑字体)：
+        ▶ Serif
+        ▶ SansSerif
+        ▶ Monospaced
+        ▶ Dialog
+        ▶ DialogInput
+     ● 字体的样式(style name)
+        ▶ plain      普通样式常量
+        ▶ bold       粗体样式
+        ▶ italic     斜体样式
+        ▶ bolditalic 粗斜体
+     ● 字符集名称(CharacterSubsetName)
+        常用的字符集如下：chinese-gbk,chinese-gb2312，japannese-x0210
+
+■3. 配置文件
+     逻辑字体与物理字体的映射关系由配置文件设置：一种是属性文件(properties),另
+     一种为二进制文件(binary format)。一般路径如下:
+     -------------------------------------------------------------------------
+     JavaHome/lib/fontconfig.OS.Version.properties
+     JavaHome/lib/fontconfig.OS.Version.bfc
+     JavaHome/lib/fontconfig.OS.properties
+     JavaHome/lib/fontconfig.OS.bfc
+     JavaHome/lib/fontconfig.Version.properties
+     JavaHome/lib/fontconfig.Version.bfc
+     JavaHome/lib/fontconfig.properties
+     JavaHome/lib/fontconfig.bfc
+     -------------------------------------------------------------------------
+     该属性文件由「sun.awt.FontConfiguration」类加载，也可以使用系统属性
+     sun.awt.fontconfig设置配置文件的路径。
+     ★属性文件的基本格式
+     ▶ a. 版本号
+          一般情况为1。直接指定为： version=1
+     ▶ b. 组件字体映射
+          定义了物理字体到逻辑字体的映射关系，key的形式主要有如下两种：
+          ▪ allfonts.CharacterSubsetName
+          ▪ LogicalFontName.StyleName.CharacterSubsetName
+          allfonts代表5种所有的逻辑字体。
+          例如：
+          allfonts.chinese-ms936=SimSun
+          serif.plain.alphabetic=Times New Roman
+
+■3. Java代码
+     Font.getFamily();   // 系列名称（family name） 例：SansSerif
+     Font.getFontName(); // 外观名称（font face name aka font name）
+                         // 例：SansSerif.bold
+     Font.getName();     // 逻辑字体名称(logical font name)
+                         // 例：SansSerif
+     Font.toString();
+     //java.awt.Font[family=SansSerif,name=SansSerif,style=bold,size=12]
+
+■参考：
+  ▶ Font Configuration Files
+    http://docs.oracle.com/javase/1.5.0/docs/guide/intl/fontconfig.html
