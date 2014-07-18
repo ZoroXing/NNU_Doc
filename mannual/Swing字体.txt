@@ -52,7 +52,7 @@
           allfonts.chinese-ms936=SimSun
           serif.plain.alphabetic=Times New Roman
 
-■3. Java代码
+■4. Java代码
      Font.getFamily();   // 系列名称（family name） 例：SansSerif
      Font.getFontName(); // 外观名称（font face name aka font name）
                          // 例：SansSerif.bold
