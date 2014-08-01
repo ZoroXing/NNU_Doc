@@ -8,7 +8,7 @@
 2. 环境配置
     ▶a. 安装VS2010，并将其添加到PATH环境变量中
           例：PATH=XX\Microsoft Visual Studio 10.0\VC\bin;%PATH%
-    ▶b. 设置JAVA_HOME环境变量
+    ▶b. 设置JAVA_HOME环境变量(使用JDK6u45 版本过高会出现错误)
 
 3. 创建HotSpot的VS2010工程
     ▶a. 运行dos命令行，执行vcvars32.bat命令设置VS2010环境
@@ -21,7 +21,7 @@
         Writing .vcxproj.user file: D:\JDK\testjdk\openjdk\hotspot\build\vs-i486\jvm.vcxproj.user    Done.
         --------------------------------------------------------------------------------------------------------
         输出如上信息代表hotspot编译成功。
-    ▶c. 打开VS2010，将%OPENJDK_HOME%/hotspot/build/build\vs-i486/jvm.vcxproj或者        直接双击jvm.vcxproj打开HotSpot工程。
+    ▶c. 打开VS2010，将%OPENJDK_HOME%/hotspot/build/build\vs-i486/jvm.vcxproj或者直接双击jvm.vcxproj打开HotSpot工程。
     ▶d. 导入成功后，F7编译HotSpot工程，但出现如下错误：
         --------------------------------------------------------------------------------------------------------
         1>Link:1>     Creating library C:\openjdk\hotspot\build\vs-i486\compiler1\debug\jvm.lib and object C:\openjdk\hotspot\build\vs-i486\compiler1\debug\jvm.exp
