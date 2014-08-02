@@ -3,13 +3,14 @@
                                                            做成日:2014/07/09
 
 1. 下载OpenJDK7的源码：
-     https://jdk7.java.net/source.html
+     http://download.java.net/openjdk/jdk7
 
 2. 环境配置
     ▶a. 安装VS2010，并将其添加到PATH环境变量中
           例：PATH=XX\Microsoft Visual Studio 10.0\VC\bin;%PATH%
     ▶b. 设置JAVA_HOME环境变量(使用JDK6u45 版本过高会出现错误)
     ▶c. 安装Cygwin.
+    ▶d. 解压的OpenJDK源码路径不要包含中文以及其他符号（如何：c++）.
 
 3. 创建HotSpot的VS2010工程
     ▶a. 运行dos命令行，执行vcvars32.bat命令设置VS2010环境
