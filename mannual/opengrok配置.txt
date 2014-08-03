@@ -1,20 +1,33 @@
 1. 下载Opengrok安装包:
     opengrok-0.12-rc3.tar.gz
     https://java.net/projects/opengrok/downloads/
+    
 2. 安装依赖包
    a. sudo apt-get install ctags
+      http://ctags.sourceforge.net/
    b. 安装tomcat.
+      http://tomcat.apache.org/download-80.cgi
+      windows 下载：32-bit Windows zip (pgp, md5) 里面包含 serivice.bat
    c. jdk7以上。
+   
 3. 将${opengrok}/lib/source.war拷贝到${tomcat}/webapp下面;
 4. 建立索引
    ${JAVA_HOME}/bin/java -Xmx524m -jar ${opengrok}/lib/opengrok.jar  \
                          -W "C:\\OpenGrok\\data\\configuration.xml"  \
                          -P -S -v -s "C:\\OpenGrok\\source"          \
                          -d "C:\\OpenGrok\\data"
+                         
+   %JAVA_HOME%\bin\java -Xmx524m -jar  %OPENGROK%\lib\opengrok.jar   ^
+            -W "D:\Workspace\openjdk\sourceindex\configuration.xml"  ^
+                          -P -S -v -s "D:\Workspace\openjdk\source"  ^
+                              -d "D:\Workspace\openjdk\sourceindex"
    补充：
    -d 建立索引的位置
    -s 源码的位置
    -W 执行配置文件的位置
+   ★ bat文件中一个命令过长需要换行时加入 "^"
+      shell文件中命令过程需要加入 "\"
+      
 5. 修改${tomcat}/webapp下source的配置文件
    ${tomcat}/webapps/source/WEB-INF/web.xml
    --------------------------------------------------------------------
@@ -26,6 +39,7 @@
     </description>
    </context-param>
    --------------------------------------------------------------------
+   
 6. 重启tomcat.
    访问:http://localhost:8080/source
 
