@@ -1,0 +1,22 @@
+■1. NFS文件系统挂载
+    > mount -F nfs -o vers=3 193.168.17.104:/opt/share/xxx/tmp /export/home/<user>/XXX
+    
+■2. 挂载ISO文件
+    > mkdir -p /mnt/iso
+    > lofiadm -a /mnt/nfs/data/sol-10-u5-ga-sparc-dvd.iso /dev/lofi/1
+    # 查看
+    > lofiadm
+      Block Device             File
+      /dev/lofi/1              /mnt/nfs/data/sol-10-u5-ga-sparc-dvd.iso
+    > mount -F hsfs /dev/lofi/1 /mnt/iso
+    > ls -p /mnt/iso
+    
+    # 卸载
+    > umount /mnt/iso
+    > lofiadm -d /dev/lofi/1
+    
+    ★  从挂载的ISO镜像中安装gcc软件
+    > pkgadd -d /mnt/iso/Solaris_10/Product SUNWgcc
+    
+    
+-以上-
