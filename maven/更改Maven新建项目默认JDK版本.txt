@@ -1,9 +1,10 @@
-                           更改Maven新建项目默认JDK版本
+﻿                           更改Maven新建项目默认JDK版本
                                                               做成者:ZoroXing
                                                               做成日:2014/10/24
 
 ■ Summary
-   使用Eclipse创建Maven工程时，工程的默认JDK版本一般设置为JDK1.5；该版本的JDK过    低，在此，提供两种方法来修改工程的JDK版本。
+   使用Eclipse创建Maven工程时，工程的默认JDK版本一般设置为JDK1.5；该版本的JDK过
+   低，在此，提供两种方法来修改工程的JDK版本。
 
 ■ 全局设定
    该方法通过设置Maven的配置文件setting.xml，使用该方法可以保证以后创建的项目
