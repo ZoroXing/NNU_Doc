@@ -1,0 +1,61 @@
+                           更改Maven新建项目默认JDK版本
+                                                              做成者:ZoroXing
+                                                              做成日:2014/10/24
+
+■ Summary
+   使用Eclipse创建Maven工程时，工程的默认JDK版本一般设置为JDK1.5；该版本的JDK过    低，在此，提供两种方法来修改工程的JDK版本。
+
+■ 全局设定
+   该方法通过设置Maven的配置文件setting.xml，使用该方法可以保证以后创建的项目
+   的默认JDK版本为设置的版本。具体修改如下：
+   ----------------------------------------------------------------------------
+   <settings>
+
+......
+
+     <profiles>
+
+       <profile>
+         <id>jdk-1.7</id>
+         <activation>
+           <activeByDefault>true</activeByDefault>
+           <jdk>1.7</jdk>
+         </activation>
+         <properties>
+           <maven.compiler.source>1.7</maven.compiler.source>
+           <maven.compiler.target>1.7</maven.compiler.target>
+           <maven.compiler.compilerVersion>1.7</maven.compiler.compilerVersion>
+         </properties>
+       </profile>
+
+     </profiles>
+
+   </settings>
+   ----------------------------------------------------------------------------
+
+■ 局部设定
+   在创建的Maven项目的pom文件中手动进行配置，选择适当的JDK版本
+   ----------------------------------------------------------------------------
+   <project>
+
+......
+
+     <build>
+       <plugins>
+         <plugin>
+           <groupId>org.apache.maven.plugins</groupId>
+           <artifactId>maven-compiler-plugin</artifactId>
+           <version>3.0</version>
+           <configuration>
+             <source>1.6</source>
+             <target>1.6</target>
+             <encoding>UTF-8</encoding>
+             <verbal>true</verbal>
+             </configuration>
+         </plugin>
+       </plugins>
+     </build>
+   </project>
+   ----------------------------------------------------------------------------
+
+-以上-
