@@ -1,0 +1,50 @@
+                              Web项目部署到Servlet容器
+                                                              作成者:ZoroXing
+                                                              作成日:2014/10/27
+
+■Summary
+  Web项目需要部署到Servlet容器中才可以工作。在maven项目中，我们可以将项目部署到
+  jetty和tomcat这样的Servlet容器中。以下将记录详细配置。
+
+■Jetty配置
+  运行：mvn jetty:run
+  -----------------------------------------------------------------------------
+  <build>
+    <finalName>web-test</finalName>
+    
+    <plugins>
+      <plugin>
+        <groupId>org.mortbay.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <configuration>
+          <！-- 在很短指定的时间内扫描web应用检查是否有改变，如果发觉有任何改
+                变则自动热部署。默认为0，表示禁用热部署检查。
+                任何一个大于0的数字都将表示启用 -->
+          <scanIntervalSeconds>0</scanIntervalSeconds>
+          <war>${basedir}/target/${project.build.finalName}.war</war>
+
+          <connectors>
+            <!-- 更改jetty的端口，在pom中的配置中通过指定新的connector来实现，
+                 例如下述 -->
+            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+              <port>9090</port>
+            </connector>
+        </connectors>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  -----------------------------------------------------------------------------
+
+  ★更改jetty端口，可以使用Java属性：mvn -Djetty.port=9999 jetty:run
+  ★参考链接：
+    ▶ jetty插件配置指南：http://www.blogjava.net/Jdonee/archive/2008/12/11/245650.html
+
+
+■Tomcat配置
+  -----------------------------------------------------------------------------
+
+  -----------------------------------------------------------------------------
+
+
+-以上-
