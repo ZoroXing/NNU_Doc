@@ -1,0 +1,54 @@
+                        使用Eclipse调试Tomcat源码
+                                                              作成者:ZoroXing
+                                                              作成日:2014/10/29
+
+■环境准备
+  1. 下载Tomcat源码
+     ▶ 直接下载 ： http://tomcat.apache.org/download-60.cgi
+     ▶ 从svn下checkout ： http://svn.apache.org/repos/asf/tomcat/tc6.0.x/trunk/
+  2. Ant安装
+     需要使用Apache Ant 1.6.5 或更新版本，本次使用的版本为1.9.4
+     http://ant.apache.org/bindownload.cgi
+
+■创建Tomcat
+  1. 下载创建Tomcat所依赖的jar文件
+     --------------------------------------------------------------------------
+     >cd ${tomcat.source}
+     >ant download
+     --------------------------------------------------------------------------
+     默认情况下，依赖jar文件下载的位置：
+     ▶ Linux/Solaris : /usr/share/java
+     ▶ Windows       : C:\usr\share\java
+     如果想自定义下载的位置，可以更改${tomcat.source}\build.properties.default
+     --------------------------------------------------------------------------
+     # ----- Default Base Path for Dependent Packages -----
+     # Replace this path with the directory path where
+     # dependencies binaries should be downloaded.
+     base.path=/home/me/some-place-to-download-to
+     --------------------------------------------------------------------------
+     在需要代理的时候需要做如下设定：
+     --------------------------------------------------------------------------
+     # ----- Proxy setup -----
+     # Uncomment if using a proxy server.
+     proxy.host=proxy.domain
+     proxy.port=8080
+     proxy.use=on
+     --------------------------------------------------------------------------
+  2. 添加Eclipse的classpath variables
+      Use Windows->Preferences and then Java->Build Path->Classpath Variables 
+      to add two new Classpath variables:
+      ▶ TOMCAT_LIBS_BASE : the base path where the binary dependencies have been downloaded
+      ▶ ANT_HOME : the base path of Ant 1.6.2 or later
+  3. 添加Eclipse工程文件
+     将${tomcat.source}目录下eclipse.classpath和eclipse.project文件备份后，做如下操作：
+     -------------------------------------------------------------------------
+     mv eclipse.classpath .classpath
+     mv eclipse.project   .project
+     -------------------------------------------------------------------------
+     将Tomcat项目导入eclise中
+
+★参考链接
+  [1] Building Tomcat
+      http://tomcat.apache.org/tomcat-6.0-doc/building.html
+
+-以上-
