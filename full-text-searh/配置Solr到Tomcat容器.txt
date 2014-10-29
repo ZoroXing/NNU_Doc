@@ -1,0 +1,58 @@
+                              配置Solr到Tomcat容器
+                                                              作成者:ZoroXing
+                                                              作成日:2014/10/29
+
+■环境准备
+  1. Solr
+     http://lucene.apache.org/solr/downloads.html
+  2. Tomcat
+     http://tomcat.apache.org/download-70.cgi
+  3. Oracle JDK7
+     http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html
+
+■基本配置
+  1. 自定义创建一个SOLR_HOME目录，将example/solr目录下的内容拷贝到${SOLR_HOME}
+     然后，再将dist/dist/solr-4.10.1.war文件拷贝到${SOLR_HOME}下。
+  2. 修改${SOLR_HOME}/collection1/conf/solrconfig.xml配置文件，修改生成索引的
+     目录：
+     --------------------------------------------------------------------------
+     - <dataDir>${solr.data.dir:}</dataDir>
+     + <dataDir>${solr.data.dir:D:\solr\solr_home\collection1\data}</dataDir>
+     --------------------------------------------------------------------------
+     ★也可以使用Tomcat的环境变量JAVA_OPTS覆盖配置文件中的路径
+     --------------------------------------------------------------------------
+     export JAVA_OPTS="$JAVA_OPTS -Dsolr.data.dir=D:\solr\solr_home\collection1\data"
+     --------------------------------------------------------------------------
+  3. 创建自定义Web部署文件
+     ▶ 在${tomcat_home}/conf目录下创建Catalina/localhost目录
+     ▶ 在该目录下创建一个web部署文件：solr-example.xml(名称任意，Tomcat启动后将会把该名称作为Web应用的虚拟路径)
+     ▶ 配置solr-example.xml文件
+       ------------------------------------------------------------------------
+       <?xml version="1.0" encoding="utf-8"?>
+         <Context docBase="D:\solr\solr_home\solr-4.10.1.war" debug="0" crossContext="true">
+           <Environment name="solr/home" type="java.lang.String" value="D:\solr\solr_home" override="true"/>
+       </Context>
+       ------------------------------------------------------------------------
+       docBase为Web应用的绝对路径，Context元素包括一个Environment子元素用于配置
+       solr_home的路径。
+
+■Troubleshooting
+  1. ▶ 启动Tomcat时，出现如下错误
+       -----------------------------------------------------------------------
+      十月 29, 2014 1:17:47 下午 org.apache.catalina.core.StandardContext start
+      严重: Error filterStart
+      十月 29, 2014 1:17:47 下午 org.apache.catalina.core.StandardContext start
+      严重: Context [/solr-example] startup failed due to previous errors
+      -------------------------------------------------------------------------
+     ▶ 解决方式
+       将example/lib/ext目录下所有jar包复到${tomcat_home}/lib的目录下[1]。
+
+■参考链接
+  [1] Error filterStart(lucene-solr-user mailing list)
+      http://mail-archives.apache.org/mod_mbox/lucene-solr-user/201409.mbox/%3Czarafa.54195b15.18aa.4b7c5cda7bcdf034@mail.openindex.io%3E
+  [2] Solr with Apache Tomcat
+      http://wiki.apache.org/solr/SolrTomcat
+  [3] Previous Releases - Solr Archive
+      http://archive.apache.org/dist/lucene/solr/
+
+-以上-
