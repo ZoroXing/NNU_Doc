@@ -1,0 +1,66 @@
+                            使用Eclipse调试Solr源码
+                                                              作成者:ZoroXing
+                                                              作成日:2014/10/30
+
+■环境准备
+  在学习Solr的过程中最好能够使用IDE对其源码进行调试，以下介绍如何将Solr源码导入
+  到Eclipse中并进行调试。基本工具：
+  ▶ Eclipse 需要使用编译支持JDK1.7的版本(例如：kepler)，因为Solr源码中使用JDK7
+    的新特性，使用JDK6将编译不通过。
+    eclipse kepler下载地址：http://www.eclipse.org/kepler/
+  ▶ 下载Solr源码，使用4.10.1版本在编译的过程中会出错，该bug的描述见[2]。本次编
+    译使用的版本是4.9.1。
+    http://apache.fayea.com/apache-mirror/lucene/solr/
+  ▶ 下载apache-ant-1.9.1，下载地址
+    http://mirror.bjtu.edu.cn/apache//ant/binaries/apache-ant-1.9.1-bin.zip
+    下载apache-ivy-2.4.0
+    http://mirrors.hust.edu.cn/apache//ant/ivy/2.4.0-rc1/apache-ivy-2.4.0-rc1-bin.zip
+   解压apache-ivy-2.4.0，并将其中的ivy-2.4.0-rc1.jar文件拷贝到${ANT_HOME}/lib目录下。
+
+■Eclipse项目构建
+  1. 构建Eclipse项目配置文件
+     --------------------------------------------------------------------------
+     >ant eclipse
+     --------------------------------------------------------------------------
+  2. 将生成的project转换为web project
+     ▶ 修改.project文件
+       在<natures>…</natures>之间添加下列三行配置
+       ------------------------------------------------------------------------
+       + <nature>org.eclipse.wst.common.project.facet.core.nature</nature>
+       + <nature>org.eclipse.wst.common.modulecore.ModuleCoreNature</nature>
+       + <nature>org.eclipse.jem.workbench.JavaEMFNature</nature>
+       ------------------------------------------------------------------------
+     ▶ 重启eclipse，选择项目右键->Properties->Project Facets；将Dynamic Web Module
+       和Java两项勾选
+     ▶ 修改项目.setting/org.eclipse.wst.common.project.facet.core.xml配置文件
+       ------------------------------------------------------------------------
+       - <installed facet="jst.web"version="3.0"/>
+       + <installed facet="jst.web"version="2.5"/>
+       ------------------------------------------------------------------------
+     ▶ 将项目${src_home}/solr/webapp/web拷贝到${src_home}/WebContent下，并修改
+       web.xml文件：
+       ------------------------------------------------------------------------
+       + <env-entry>
+       +  <env-entry-name>solr/home</env-entry-name>
+       +  <env-entry-value>D:\solr\solr-home</env-entry-value>
+       +  <env-entry-type>java.lang.String</env-entry-type>
+       + </env-entry>
+       ------------------------------------------------------------------------
+       以上就是配置以下solr_home。
+     ▶ 创建solr_home
+       在任意目录下创建一个solr_home目录，将${src_home}/solr/example/solr下的
+       所有文件拷贝到此。该目录就是上步骤中在web.xml中配置的目录。
+     ▶ 添加Web项目依赖的jar包
+       解压solr binary下的solr.war文件，将解压后lib下的jar文件拷贝到${src_home}/WebContent/WEB-INF/lib目录下。
+     ▶ 将项目部署到Tomcat上运行，输入：http://localhost:8080/solr-4.9.1/
+
+■参考链接
+  [1]. Windows 7 / Windows 8 - how to compile Solrj
+       https://wiki.apache.org/solr/HowToCompileSolr
+  [2]. Failed attempt of downloading javax:activation javadoc
+       https://issues.apache.org/jira/browse/LUCENE-6007
+  [3]. jquery.min.js一引入到工程中显示红叉
+       http://bbs.csdn.net/topics/390530826
+  [4]. http://sbp810050504.blog.51cto.com/2799422/1212891
+
+-以上-
