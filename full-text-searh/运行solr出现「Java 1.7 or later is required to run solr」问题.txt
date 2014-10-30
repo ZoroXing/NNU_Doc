@@ -1,0 +1,77 @@
+         运行solr出现「Java 1.7 or later is required to run solr」问题
+                                                              作成者:ZoroXing
+                                                              作成日:2014/10/30
+
+
+■异常问题
+  将下载好的Solr的bin路径添加到path，运行solr命令出现如下问题：
+  -----------------------------------------------------------------------------
+  C:\Users\xxx >solr
+  Java 1.7 or later is required to run Solr.
+  -----------------------------------------------------------------------------
+  使用java -version发现的确是jdk1.7（实际版本为:1.7.0_51）
+
+■基本原因
+  ★该问题的主要原因是：在solr脚本中有如下语句
+    ---------------------------------------------------------------------------
+    if NOT DEFINED JAVA_HOME goto need_java_home
+    "%JAVA_HOME%"\bin\java -version:1.8 -version > nul 2>&1
+    IF ERRORLEVEL 1 "%JAVA_HOME%"\bin\java -version:1.7 -version > nul 2>&1
+    IF ERRORLEVEL 1 goto need_java_vers
+    ---------------------------------------------------------------------------
+    脚本使用的是jvaa -verison:<release> -version 来判断jdk版本。而-verison:<release>
+    选项是依赖于JDK的在注册表: HKEY_CURRENT_USER(HKEY_LOCAL_MACHINE)\Software\JavaSoft\Java Runtime Environment
+    中的值进行判断的。由于本机是不是使用安装版的JDK，所以该注册表中不存在相应的
+    值。解决的办法有两个：
+    ▶ 从Orcale官网下载安装版本的JDK7，安装后即可使用
+    ▶ 手动配置注册表HKEY_CURRENT_USER\Software\JavaSoft\Java Runtime Environment      -------------------------------------------------------------------------
+      [HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.7]
+      "JavaHome"="C:\\Program Files\\Java\\jre7"
+      "RuntimeLib"="C:\\Program Files\\Java\\jre7\\bin\\client\\jvm.dll"
+      "MicroVersion"="0"
+      -------------------------------------------------------------------------
+
+■原因详细
+  主要就是搞清java.exe的-verison:<release>选项的原理，官方解释如下：
+  http://docs.oracle.com/javase/7/docs/technotes/tools/windows/java.html
+  基本调用
+  -----------------------------------------------------------------------------
+  http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/share/bin/java.c#SelectVersion
+  ↓
+  http://hg.openjdk.java.net/jdk7/jdk7/jdk/file/9b8c96f96a0f/src/windows/bin/java_md.c#LocateJRE
+  该函数注释如下：
+  /*
+   * This is the global entry point. It examines the host for the optimal
+   * JRE to be used by scanning a set of registry entries.  This set of entries
+   * is hardwired on Windows as "Software\JavaSoft\Java Runtime Environment"
+   * under the set of roots "{ HKEY_CURRENT_USER, HKEY_LOCAL_MACHINE }".
+   *
+   * This routine simply opens each of these registry directories before passing
+   * control onto ProcessDir().
+   */
+   ★Windows操作注册表基本API
+     ▶ RegOpenKeyEx //获取指定主键和子建的注册表键句柄
+                    //例：主键：HKEY_LOCAL_MACHINE
+                         子键：Software\JavaSoft\Java Runtime Environment
+     ▶ RegEnumKey   //遍历项目
+     ▶ RegOpenKeyEx
+     ▶ RegQueryValueEx //查询
+       例如：RegQueryValueEx(ver_key, "JavaHome", NULL, NULL, (LPBYTE)name, &len)
+
+■补充：
+  1. 操作系统寻找JRE的顺序如下：
+     ▶ 先找当前目录下有没有JRE
+     ▶ 再找父目录下有没有JRE
+     ▶ 接着在PATH路径中找JRE
+     ▶ 注册表HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\ 查看CurrentVersion
+
+  2. 安装JDK后创建3个项目
+     ▶ HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit
+     ▶ HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Plug-in
+     ▶ HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Runtime Environment
+
+■参考链接
+  [1]. 注册表操作
+       http://blog.csdn.net/whentanking/article/details/7371509
+
+-以上-
