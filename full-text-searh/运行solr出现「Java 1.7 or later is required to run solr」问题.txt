@@ -26,6 +26,8 @@
     ▶ 从Orcale官网下载安装版本的JDK7，安装后即可使用
     ▶ 手动配置注册表HKEY_CURRENT_USER\Software\JavaSoft\Java Runtime Environment
       -------------------------------------------------------------------------
+      Windows Registry Editor Version 5.00
+
       [HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.7]
       "JavaHome"="C:\\Program Files\\Java\\jre7"
       "RuntimeLib"="C:\\Program Files\\Java\\jre7\\bin\\client\\jvm.dll"
