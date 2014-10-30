@@ -24,7 +24,8 @@
     中的值进行判断的。由于本机是不是使用安装版的JDK，所以该注册表中不存在相应的
     值。解决的办法有两个：
     ▶ 从Orcale官网下载安装版本的JDK7，安装后即可使用
-    ▶ 手动配置注册表HKEY_CURRENT_USER\Software\JavaSoft\Java Runtime Environment      -------------------------------------------------------------------------
+    ▶ 手动配置注册表HKEY_CURRENT_USER\Software\JavaSoft\Java Runtime Environment
+      -------------------------------------------------------------------------
       [HKEY_LOCAL_MACHINE\SOFTWARE\JavaSoft\Java Runtime Environment\1.7]
       "JavaHome"="C:\\Program Files\\Java\\jre7"
       "RuntimeLib"="C:\\Program Files\\Java\\jre7\\bin\\client\\jvm.dll"
