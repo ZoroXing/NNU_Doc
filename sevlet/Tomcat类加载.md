@@ -1,5 +1,8 @@
 ##Tomcat类加载机制
-
+<pre>
+                                                                                          作成者：XINGJL
+                                                                                          作成日：2014/12/04
+</pre>
 ### 1. 概述
 
 Tomcat内置了一系列的类加载器，保证运行在容器中的不同Web应用程序使用不同的类路径和资源仓库。在Java环境中，类加载机制采用双亲委派机制；但是，在Tomcat中WebappClassLoader加载器并未采用这种机制（在后面将详细讨论）。
@@ -65,7 +68,7 @@ server.loader=${catalina.home}/server/classes,${catalina.home}/server/lib/*.jar
 shared.loader=${catalina.base}/shared/classes,${catalina.base}/shared/lib/*.jar
 ```
   因此，Tomcat5 会分别创建：Common,Catalina和Shared类加载器，相应关系如（pic2-1）
-
+![Classloader parent-child relationships 5](https://github.com/ZoroXing/NNU_Doc/blob/master/picture/tomcat/clsloader_5.5.png)
 #### Tomcat6.x or later
 默认catalina.properties属性文件如下：
 ```
@@ -150,4 +153,13 @@ Tomcat 的类加载器实现类有两种：StandardClassLoader和WebappClassLoad
 -  /WEB-INF/classes of your web application
 -  /WEB-INF/lib/*.jar of your web application
 
+
+### 参考链接
+[1].[Tomcat5.5 Class Loader HOW-TO](http://tomcat.apache.org/tomcat-5.5-doc/class-loader-howto.html)<br>
+[2].[Tomcat6.0 Class Loader HOW-TO](http://tomcat.apache.org/tomcat-6.0-doc/class-loader-howto.html)<br>
+[3].[Tomcat7.0 Class Loader HOW-TO](http://tomcat.apache.org/tomcat-7.0-doc/class-loader-howto.html)<br>
+[4].[Tomcat8.0 Class Loader HOW-TO](http://tomcat.apache.org/tomcat-8.0-doc/class-loader-howto.html)<br>
+[5].[Tomcat download](http://archive.apache.org/dist/tomcat/)<br>
+
 以上。
+
