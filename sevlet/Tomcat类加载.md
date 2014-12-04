@@ -80,7 +80,7 @@ shared.loader=
 ![Classloader parent-child relationships 6 or later](https://github.com/ZoroXing/NNU_Doc/blob/master/picture/tomcat/clsloader_6_later.png)
 
 ### 5. Tomcat的类加载机制
-Tomcat 的类加载器实现类有两种：StandardClassLoader和WebappClassLoader两种。其中StandardClassLoader未重载loadClass方法，因此采用的仍然是双亲委派原则；然而WebappClassLoader重载了loadClass方法，使用了另外一种类加载策略。然而，
+Tomcat 的类加载器实现类有两种：StandardClassLoader和WebappClassLoader两种。其中StandardClassLoader未重载loadClass方法，因此采用的仍然是双亲委派原则；然而WebappClassLoader重载了loadClass方法，使用了另外一种类加载策略。然而，各个版本又有稍许差别。
 
 #### Tomcat6
 ##### 当delegate="false"时，默认值
@@ -123,6 +123,138 @@ Tomcat 的类加载器实现类有两种：StandardClassLoader和WebappClassLoad
 
 **备注**：默认情况下，Tomcat6 shared类加载器路径。
 
+org.apache.catalina.loader.WebappClassLoader#loadClass<br>
+```
+public synchronized Class loadClass(String name, boolean resolve)
+        throws ClassNotFoundException {
+
+        if (log.isDebugEnabled())
+            log.debug("loadClass(" + name + ", " + resolve + ")");
+        Class clazz = null;
+
+        // Log access to stopped classloader
+        if (!started) {
+            try {
+                throw new IllegalStateException();
+            } catch (IllegalStateException e) {
+                log.info(sm.getString("webappClassLoader.stopped", name), e);
+            }
+        }
+
+        // (0) Check our previously loaded local class cache
+        clazz = findLoadedClass0(name);
+        if (clazz != null) {
+            if (log.isDebugEnabled())
+                log.debug("  Returning class from cache");
+            if (resolve)
+                resolveClass(clazz);
+            return (clazz);
+        }
+
+        // (0.1) Check our previously loaded class cache
+        clazz = findLoadedClass(name);
+        if (clazz != null) {
+            if (log.isDebugEnabled())
+                log.debug("  Returning class from cache");
+            if (resolve)
+                resolveClass(clazz);
+            return (clazz);
+        }
+
+        // (0.2) Try loading the class with the system class loader, to prevent
+        //       the webapp from overriding J2SE classes
+        try {
+            // 使用系统类加载器
+            clazz = system.loadClass(name);
+            if (clazz != null) {
+                if (resolve)
+                    resolveClass(clazz);
+                return (clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+
+        // (0.5) Permission to access this class when using a SecurityManager
+        if (securityManager != null) {
+            int i = name.lastIndexOf('.');
+            if (i >= 0) {
+                try {
+                    securityManager.checkPackageAccess(name.substring(0,i));
+                } catch (SecurityException se) {
+                    String error = "Security Violation, attempt to use " +
+                        "Restricted Class: " + name;
+                    log.info(error, se);
+                    throw new ClassNotFoundException(error, se);
+                }
+            }
+        }
+
+        boolean delegateLoad = delegate || filter(name);
+
+        // (1) Delegate to our parent if requested
+        if (delegateLoad) {
+            if (log.isDebugEnabled())
+                log.debug("  Delegating to parent classloader1 " + parent);
+            ClassLoader loader = parent;
+            if (loader == null)
+                loader = system;
+            try {
+                clazz = loader.loadClass(name);
+                if (clazz != null) {
+                    if (log.isDebugEnabled())
+                        log.debug("  Loading class from parent");
+                    if (resolve)
+                        resolveClass(clazz);
+                    return (clazz);
+                }
+            } catch (ClassNotFoundException e) {
+                ;
+            }
+        }
+
+        // (2) Search local repositories
+        if (log.isDebugEnabled())
+            log.debug("  Searching local repositories");
+        try {
+            clazz = findClass(name);
+            if (clazz != null) {
+                if (log.isDebugEnabled())
+                    log.debug("  Loading class from local repository");
+                if (resolve)
+                    resolveClass(clazz);
+                return (clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            ;
+        }
+
+        // (3) Delegate to parent unconditionally
+        if (!delegateLoad) {
+            if (log.isDebugEnabled())
+                log.debug("  Delegating to parent classloader at end: " + parent);
+            ClassLoader loader = parent;
+            if (loader == null)
+                loader = system;
+            try {
+                clazz = loader.loadClass(name);
+                if (clazz != null) {
+                    if (log.isDebugEnabled())
+                        log.debug("  Loading class from parent");
+                    if (resolve)
+                        resolveClass(clazz);
+                    return (clazz);
+                }
+            } catch (ClassNotFoundException e) {
+                ;
+            }
+        }
+
+        throw new ClassNotFoundException(name);
+
+    }
+```
+
 #### Tomcat7 or later
 
 ##### 当delegate="false"时，默认值
@@ -153,6 +285,146 @@ Tomcat 的类加载器实现类有两种：StandardClassLoader和WebappClassLoad
 -  /WEB-INF/classes of your web application
 -  /WEB-INF/lib/*.jar of your web application
 
+org.apache.catalina.loader.WebappClassLoader#loadClass<br>
+```
+    public synchronized Class<?> loadClass(String name, boolean resolve)
+        throws ClassNotFoundException {
+
+        if (log.isDebugEnabled())
+            log.debug("loadClass(" + name + ", " + resolve + ")");
+        Class<?> clazz = null;
+
+        // Log access to stopped classloader
+        if (!started) {
+            try {
+                throw new IllegalStateException();
+            } catch (IllegalStateException e) {
+                log.info(sm.getString("webappClassLoader.stopped", name), e);
+            }
+        }
+
+        // (0) Check our previously loaded local class cache
+        clazz = findLoadedClass0(name);
+        if (clazz != null) {
+            if (log.isDebugEnabled())
+                log.debug("  Returning class from cache");
+            if (resolve)
+                resolveClass(clazz);
+            return (clazz);
+        }
+
+        // (0.1) Check our previously loaded class cache
+        clazz = findLoadedClass(name);
+        if (clazz != null) {
+            if (log.isDebugEnabled())
+                log.debug("  Returning class from cache");
+            if (resolve)
+                resolveClass(clazz);
+            return (clazz);
+        }
+
+        // (0.2) Try loading the class with the system class loader, to prevent
+        //       the webapp from overriding J2SE classes
+        try {
+            // j2seClassLoader为引导类加载器。
+            clazz = j2seClassLoader.loadClass(name);
+            if (clazz != null) {
+                if (resolve)
+                    resolveClass(clazz);
+                return (clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+
+        // (0.5) Permission to access this class when using a SecurityManager
+        if (securityManager != null) {
+            int i = name.lastIndexOf('.');
+            if (i >= 0) {
+                try {
+                    securityManager.checkPackageAccess(name.substring(0,i));
+                } catch (SecurityException se) {
+                    String error = "Security Violation, attempt to use " +
+                        "Restricted Class: " + name;
+                    log.info(error, se);
+                    throw new ClassNotFoundException(error, se);
+                }
+            }
+        }
+
+        boolean delegateLoad = delegate || filter(name);
+
+        // (1) Delegate to our parent if requested
+        if (delegateLoad) {
+            if (log.isDebugEnabled())
+                log.debug("  Delegating to parent classloader1 " + parent);
+            try {
+                clazz = Class.forName(name, false, parent);
+                if (clazz != null) {
+                    if (log.isDebugEnabled())
+                        log.debug("  Loading class from parent");
+                    if (resolve)
+                        resolveClass(clazz);
+                    return (clazz);
+                }
+            } catch (ClassNotFoundException e) {
+                // Ignore
+            }
+        }
+
+        // (2) Search local repositories
+        if (log.isDebugEnabled())
+            log.debug("  Searching local repositories");
+        try {
+            clazz = findClass(name);
+            if (clazz != null) {
+                if (log.isDebugEnabled())
+                    log.debug("  Loading class from local repository");
+                if (resolve)
+                    resolveClass(clazz);
+                return (clazz);
+            }
+        } catch (ClassNotFoundException e) {
+            // Ignore
+        }
+
+        // (3) Delegate to parent unconditionally
+        if (!delegateLoad) {
+            if (log.isDebugEnabled())
+                log.debug("  Delegating to parent classloader at end: " + parent);
+            try {
+                clazz = Class.forName(name, false, parent);
+                if (clazz != null) {
+                    if (log.isDebugEnabled())
+                        log.debug("  Loading class from parent");
+                    if (resolve)
+                        resolveClass(clazz);
+                    return (clazz);
+                }
+            } catch (ClassNotFoundException e) {
+                // Ignore
+            }
+        }
+
+        throw new ClassNotFoundException(name);
+
+    }
+```
+j2seClassLoader类的初始化<br>
+```
+public WebappClassLoader() {
+-中略-
+        ClassLoader j = String.class.getClassLoader();
+        if (j == null) {
+            j = getSystemClassLoader();
+            while (j.getParent() != null) {
+                j = j.getParent();
+            }
+        }
+        this.j2seClassLoader = j;
+-中略-
+}
+```
 
 ### 参考链接
 [1].[Tomcat5.5 Class Loader HOW-TO](http://tomcat.apache.org/tomcat-5.5-doc/class-loader-howto.html)<br>
