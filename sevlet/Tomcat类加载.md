@@ -10,7 +10,144 @@ Tomcat内置了一系列的类加载器，保证运行在容器中的不同Web�
 Tomcat中自定义的类加载器有4种，分别是Common，Catalina，Shared
 和WebApp，具体定义如下：
 
-名称   | 实现类 | 父加载器 | ClassPath
-Common |org.apache.catalina.loader.StandardClassLoader|System | /common/*
-Catalina|同上|common|/server/*
-Shared|同上|common | 
+名称    |  实现类  |  父加载器  |  ClassPath
+--------| -------- | ---------  | ---------
+Common | org.apache.catalina.loader.StandardClassLoader | system | /common/*
+Catalina| 同上 | common | /server/*
+Shared  | 同上 | common | /shared/*
+WebApp  | org.apache.catalina.loader.WebappClassLoader | Shared | /WebApp/WEB-INF/*
+
+详细的关系如下图（pic2-1）：<br><br>
+![Classloader parent-child relationships 5](https://github.com/ZoroXing/NNU_Doc/blob/master/picture/tomcat/clsloader_5.5.png)
+
+### 3. 类加载器初始化过程
+Tomcat启动后首先启动初始化：Common,Catalina和Shared类加载器。具体调用如下：
+org.apache.catalina.startup.Bootstrap#main
+↓
+org.apache.catalina.startup.Bootstrap#init
+↓
+org.apache.catalina.startup.Bootstrap#initClassLoaders
+```
+private void initClassLoaders() {
+        try {
+            // Common类加载器
+            commonLoader = createClassLoader("common", null);
+            if( commonLoader == null ) {
+                // no config file, default to this loader - we might be in a 'single' env.
+                commonLoader=this.getClass().getClassLoader();
+            }
+            // Catalina类加载器
+            catalinaLoader = createClassLoader("server", commonLoader);
+            // Shared类加载器
+            sharedLoader = createClassLoader("shared", commonLoader);
+        } catch (Throwable t) {
+            log.error("Class loader creation threw exception", t);
+            System.exit(1);
+        }
+    }
+```
+org.apache.catalina.startup.Bootstrap#createClassLoader代码如下：
+```
+private ClassLoader createClassLoader(String name, ClassLoader parent)
+        throws Exception {
+        // 根据${Tomcat_home}\conf\catalina.properties获取属性值
+        String value = CatalinaProperties.getProperty(name + ".loader");
+        if ((value == null) || (value.equals("")))
+            return parent;
+-中略-
+```
+### 4. Tomcat各个版本类加载器区别
+#### Tomcat5.5
+  Tomcat5的中默认catalina.properties属性文件如下：
+```
+common.loader=${catalina.home}/common/classes,${catalina.home}/common/i18n/*.jar,${catalina.home}/common/endorsed/*.jar,${catalina.home}/common/lib/*.jar
+server.loader=${catalina.home}/server/classes,${catalina.home}/server/lib/*.jar
+shared.loader=${catalina.base}/shared/classes,${catalina.base}/shared/lib/*.jar
+```
+  因此，Tomcat5 会分别创建：Common,Catalina和Shared类加载器，相应关系如（pic2-1）
+
+#### Tomcat6.x or later
+默认catalina.properties属性文件如下：
+```
+common.loader=${catalina.base}/lib,${catalina.base}/lib/*.jar,${catalina.home}/lib,${catalina.home}/lib/*.jar
+server.loader=
+shared.loader=
+```
+因此，他们创建的Common,Catalina和Shared类加载器为同一个实例，即Common，相应的关系图如下(pic4-1)<br><br>
+![Classloader parent-child relationships 6 or later](https://github.com/ZoroXing/NNU_Doc/blob/master/picture/tomcat/clsloader_6_later.png)
+
+### 5. Tomcat的类加载机制
+Tomcat 的类加载器实现类有两种：StandardClassLoader和WebappClassLoader两种。其中StandardClassLoader未重载loadClass方法，因此采用的仍然是双亲委派原则；然而WebappClassLoader重载了loadClass方法，使用了另外一种类加载策略。然而，
+
+#### Tomcat6
+##### 当delegate="false"时，默认值
+1. 检查缓存中是否存在要加载的类
+2. 若缓存中没有，则首先使用**系统类加载器**加载，防止Web应用程序中的类覆盖J2SE的类
+3. 从当前仓库中载入相关类
+4. 使用父类载入器。若父类载入器为null，使用**系统的类加载器**进行加载
+5. 若仍未找到需要的类，则抛出ClasNotFoundException异常。<br>
+类加载顺序:<br>
+
+-  Bootstrap classes of your JVM
+-  System class loader classes (described above)
+-  /WEB-INF/classes of your web application
+-  /WEB-INF/lib/*.jar of your web application
+-  $CATALINA_HOME/common/classes
+-  $CATALINA_HOME/common/endorsed/*.jar
+-  $CATALINA_HOME/common/i18n/*.jar
+-  $CATALINA_HOME/common/lib/*.jar
+-  $CATALINA_BASE/shared/classes
+-  $CATALINA_BASE/shared/lib/*.jar
+
+##### 当delegate="true"时
+1. 检查缓存中是否存在要加载的类
+2. 若缓存中没有，则首先使用**系统类加载器**加载，防止Web应用程序中的类覆盖J2SE的类
+3. 使用父类载入器。若父类载入器为null，使用**系统的类加载器**进行加载
+4. 从当前仓库中载入相关类
+5. 若仍未找到需要的类，则抛出ClasNotFoundException异常。<br>
+类加载顺序:<br>
+
+-  Bootstrap classes of your JVM
+-  System class loader classes (described above)
+-  $CATALINA_HOME/common/classes
+-  $CATALINA_HOME/common/endorsed/*.jar
+-  $CATALINA_HOME/common/i18n/*.jar
+-  $CATALINA_HOME/common/lib/*.jar
+-  $CATALINA_BASE/shared/classes
+-  $CATALINA_BASE/shared/lib/*.jar
+-  /WEB-INF/classes of your web application
+-  /WEB-INF/lib/*.jar of your web application
+
+**备注**：默认情况下，Tomcat6 shared类加载器路径。
+
+#### Tomcat7 or later
+
+##### 当delegate="false"时，默认值
+1. 检查缓存中是否存在要加载的类
+2. 若缓存中没有，则首先使用**引导类加载器**加载，防止Web应用程序中的类覆盖J2SE的类
+3. 从当前仓库中载入相关类
+4. 使用父类载入器。若父类载入器为null，使用**引导类加载器**进行加载
+5. 若仍未找到需要的类，则抛出ClasNotFoundException异常。<br>
+
+类加载顺序:<br>
+-  Bootstrap classes of your JVM
+-  /WEB-INF/classes of your web application
+-  /WEB-INF/lib/*.jar of your web application
+-  System class loader classes (described above)
+-  Common class loader classes (described above)
+
+##### 当delegate="true"时
+1. 检查缓存中是否存在要加载的类
+2. 若缓存中没有，则首先使用**引导类加载器**加载，防止Web应用程序中的类覆盖J2SE的类
+3. 使用父类载入器。若父类载入器为null，使用**引导类加载器**进行加载
+4. 从当前仓库中载入相关类
+5. 若仍未找到需要的类，则抛出ClasNotFoundException异常。<br>
+类加载顺序:<br>
+
+-  Bootstrap classes of your JVM
+-  System class loader classes (described above)
+-  Common class loader classes (described above)
+-  /WEB-INF/classes of your web application
+-  /WEB-INF/lib/*.jar of your web application
+
+以上。
