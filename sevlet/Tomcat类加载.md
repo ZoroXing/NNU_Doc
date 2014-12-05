@@ -24,12 +24,12 @@ WebApp  | org.apache.catalina.loader.WebappClassLoader | Shared | /WebApp/WEB-IN
 ![Classloader parent-child relationships 5](https://github.com/ZoroXing/NNU_Doc/blob/master/picture/tomcat/clsloader_5.5.png)
 
 ### 3. 类加载器初始化过程
-Tomcat启动后首先启动初始化：Common,Catalina和Shared类加载器。具体调用如下：
-org.apache.catalina.startup.Bootstrap#main
-↓
-org.apache.catalina.startup.Bootstrap#init
-↓
-org.apache.catalina.startup.Bootstrap#initClassLoaders
+Tomcat启动后首先启动初始化：Common,Catalina和Shared类加载器。具体调用如下：<br>
+org.apache.catalina.startup.Bootstrap#main<br>
+↓<br>
+org.apache.catalina.startup.Bootstrap#init<br>
+↓<br>
+org.apache.catalina.startup.Bootstrap#initClassLoaders<br>
 ```
 private void initClassLoaders() {
         try {
