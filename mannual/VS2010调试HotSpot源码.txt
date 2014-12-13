@@ -44,3 +44,15 @@
 
 -以上-
 
+备注：
+1. cygwin安装目录需要是c:\cygwin\bin，openjdk\hotspot\make\windows\create.bat
+   ----------------------------------------------------------------------------------------------------------------
+   :test3
+   if not "%HOTSPOTMKSHOME%" == "" goto makedir
+   if exist c:\cygwin\bin set HOTSPOTMKSHOME=c:\cygwin\bin
+   if not "%HOTSPOTMKSHOME%" == "" goto makedir
+   echo Warning: please set variable HOTSPOTMKSHOME to place where 
+   echo          your MKS/Cygwin installation is
+   echo.
+   goto usage
+   ----------------------------------------------------------------------------------------------------------------
