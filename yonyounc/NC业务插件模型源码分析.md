@@ -41,7 +41,7 @@
 
 为了说明**业务插件**代码的运行原理，我们以品牌(bd_branddoc)插入后业务插件为例进行说明。VC6.0中大部分单据界面都需要一个Spring.xml 文件来配置界面，对界面进行布局。这个xml文件必须放在client文件夹下，路径和注册功能节点是注册的“BeanConfigPath”参数一致。
 
-!(应用管理平台->开发配置工具->功能注册)[]
+![应用管理平台->开发配置工具->功能注册](https://github.com/ZoroXing/NNU_Doc/blob/master/picture/yonyounc/brandfunc.png)
 
 在**uiuapbd_brand.jar**文件中找到对应的spring配置文件：branddoc_globe.xml,主要配置如下：
 
@@ -89,7 +89,7 @@
 
 当点击保存按钮时，会调用nc.ui.uif2.actions.batch.BatchSaveAction类(父类为：javax.swing.Action)的doAction方法。基本的类调用关系如下图：
 
-!(品牌业务插件调用过程)[]
+![品牌业务插件调用过程](https://github.com/ZoroXing/NNU_Doc/blob/master/picture/yonyounc/brandplugincls.png)
 
 
 ```
