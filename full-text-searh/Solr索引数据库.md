@@ -14,11 +14,11 @@
 
 RDBMS的相关信息配置在data-config.xml中，主要用途如下：
 
-- How to fetch data (queries,url etc)
-- What to read ( resultset columns, xml fields etc)
-- How to process (modify/add/remove fields)
- ---------------------------------------------------------------
+1.  How to fetch data (queries,url etc)
+2.  What to read ( resultset columns, xml fields etc)
+3.  How to process (modify/add/remove fields)
 
+---------------------------------------------------------------------------------------------
     <dataConfig>
      <dataSource type="JdbcDataSource"
               driver="com.mysql.jdbc.Driver"
@@ -32,10 +32,11 @@ RDBMS的相关信息配置在data-config.xml中，主要用途如下：
         </entity>
     </document>
     </dataConfig>
+---------------------------------------------------------------------------------------------
 
-- document：一个文档也就是lucene的document，一个文档包含一个或多个根entity。
+1.  document：一个文档也就是lucene的document，一个文档包含一个或多个根entity。
 
-- entity： 一个entity代表关系数据库中的一个table/view,一个根entity可以包含多个子entity或多个field。
+2.  entity： 一个entity代表关系数据库中的一个table/view,一个根entity可以包含多个子entity或多个field。
 	1. entity默认属性
 	
 		- name：一个唯一的名称用于区分不同entity（随意）
@@ -60,7 +61,7 @@ RDBMS的相关信息配置在data-config.xml中，主要用途如下：
 		- deletePkQuery:
 		
 
-- field：属性column是数据库的字段，name是filed的名字，即schema中的field name。假如column name与field name 不同，则需要手动指定field name属性。 
+3.  field：属性column是数据库的字段，name是filed的名字，即schema中的field name。假如column name与field name 不同，则需要手动指定field name属性。 
 
 
 #####3. 索引数据库
